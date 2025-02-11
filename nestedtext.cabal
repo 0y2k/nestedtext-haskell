@@ -1,6 +1,6 @@
 cabal-version:      3.8
 name:               nestedtext
-version:            0.1.0
+version:            0.1.1
 synopsis:           NestedText: A Human Friendly Data Format
 description:
     Haskell implementation of [NestedText](https://nestedtext.org/) 3.7
