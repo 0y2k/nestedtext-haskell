@@ -4,12 +4,13 @@ import Control.Monad (forM)
 import Data.List (singleton)
 import qualified Data.Map as M
 import qualified Data.Text as T
+import qualified Data.Text.Lazy as TL
 import qualified Data.Text.Lazy.IO as TL
 import qualified Data.Text.Short as ST
 import qualified Data.Vector as V
 import System.Directory (doesFileExist, listDirectory)
 import System.FilePath ((</>))
-import System.IO (readFile')
+import System.IO (Newline(..), nativeNewline)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertFailure, testCase, (@?=))
 import qualified Text.JSON as J
@@ -44,6 +45,22 @@ instance J.JSON I where
       return (ST.pack k, unI i)
   readJSON _ = J.Error "cannot convert json to nestedtext item"
   showJSON _ = error "unimplemented"
+
+decodeJSON :: FilePath -> IO (Maybe Item)
+decodeJSON file = do
+  ts <- TL.readFile file
+  return $ case J.decode $ TL.unpack ts of
+    J.Ok (I i) -> Just $ f i
+    J.Error _err -> Nothing
+ where
+  f = case nativeNewline of
+    LF -> id
+    CRLF -> bimap (ST.fromText . r . ST.toText) r
+  r = T.replace (T.pack "\n") (T.pack "\r\n")
+  bimap _fk fv (Item'String ts) = Item'String $ fv ts
+  bimap fk fv (Item'List vs) = Item'List $ V.map (bimap fk fv) vs
+  bimap fk fv (Item'Dictionary dic) =
+    Item'Dictionary $ bimap fk fv <$> M.mapKeys fk dic
 
 test_official :: IO [TestTree]
 test_official = do
@@ -105,15 +122,15 @@ test_official = do
     tls <- if elem d skipLoad then return [] else case tl of
       TestLoad'Nothing -> return []
       TestLoad'ShouldSuccess fin fout -> do
-        jout <- readFile' fout
-        case J.decode jout of
-          J.Ok (I iout) -> return $ singleton $ testCase "load" $ do
+        mjout <- decodeJSON fout
+        case  mjout of
+          Just iout -> return $ singleton $ testCase "load" $ do
             nin <- TL.readFile fin
             case parse nin of
               Right iin -> do
                 iin @?= iout
               Left err -> assertFailure $ show err
-          J.Error _err -> return []
+          Nothing -> return []
       TestLoad'ShouldFailure fin -> return $ singleton $ testCase "load" $ do
         nin <- TL.readFile fin
         case parse nin of
@@ -122,17 +139,17 @@ test_official = do
     tds <- if elem d skipDump then return [] else case td of
       TestDump'Nothing -> return []
       TestDump'ShouldSuccess fin fout -> do
-        jin <- readFile' fin
-        case J.decode jin of
-          J.Ok (I iin) -> return $ singleton $ testCase "dump" $ do
+        mjin <- decodeJSON fin
+        case mjin of
+          Just iin -> return $ singleton $ testCase "dump" $ do
             nout <- TL.readFile fout
             serialize 4 iin @?= nout
-          J.Error _err -> return []
+          Nothing -> return []
       TestDump'ShouldFailure fin -> return $ singleton $ testCase "dump" $ do
-        jin <- readFile' fin
-        case J.decode jin of
-          J.Ok (I iin) -> do
+        mjin <- decodeJSON fin
+        case mjin of
+          Just iin -> do
             let _ = iin :: Item
             assertFailure $ "dump succeed! it should fail. " ++ show iin
-          J.Error _err -> return ()
+          Nothing -> return ()
     return $ testGroup d $ tls ++ tds
