@@ -1,0 +1,10 @@
+:set -XOverloadedStrings
+import qualified Data.Map.Strict as M
+import qualified Data.Text as T
+import qualified Data.Text.IO as T
+import qualified Data.Text.Lazy.IO as TL
+import qualified Data.Vector as V
+import Lens.Micro.Platform
+import qualified Pipes as P
+import qualified Pipes.Prelude as P
+import qualified Pipes.Text as PT

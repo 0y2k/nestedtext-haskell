@@ -1,0 +1,4 @@
+[submodule "vendor/github.com/KenKundert/nestedtext_tests"]
+	path = vendor/github.com/KenKundert/nestedtext_tests
+	url = https://github.com/0y2k/nestedtext_tests
+	branch = 0y2k
