@@ -21,7 +21,6 @@ import qualified Data.Text.Lazy as TL
 import qualified Data.Vector as V
 import Data.Void
 import Generic.Data
-import Lens.Micro.Platform
 import qualified Pipes as P
 import qualified Pipes.Parse as PP
 import qualified Pipes.Prelude as P
@@ -135,7 +134,7 @@ data WaitingCharDict
 
 parse :: TL.Text -> Either ParseError Item
 parse ts0 = StateT.evalStateT parser
-  $ PT.folds (<>) T.empty id (PT.fromLazy ts0 ^. PT.lines)
+  $ PT.folds (<>) T.empty id (splitLines $ PT.fromLazy ts0)
   P.>-> P.mapM toLine
   P.>-> P.mapMaybe toValidLine
  where
