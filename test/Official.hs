@@ -1,15 +1,23 @@
 module Official where
 
 import Control.Monad (forM)
+import Data.Functor.Identity (Identity(..))
 import Data.List (singleton)
 import qualified Data.Map as M
 import qualified Data.Text as T
-import qualified Data.Text.Lazy.IO as TL
+import qualified Data.Text.Lazy as TL
+import qualified Data.Text.Lazy.IO as TLIO
 import qualified Data.Text.Short as ST
 import qualified Data.Vector as V
+import qualified Pipes.Text as PT
 import System.Directory (doesFileExist, listDirectory)
 import System.FilePath ((</>))
-import System.IO (readFile')
+import System.IO
+  ( IOMode(..), Newline(..)
+  , hSetEncoding, hSetNewlineMode
+  , nativeNewline, nativeNewlineMode, noNewlineTranslation
+  , openFile, utf8
+  )
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertFailure, testCase, (@?=))
 import qualified Text.JSON as J
@@ -17,6 +25,7 @@ import qualified Text.JSON as J
 import Data.NestedText.Parse
 import Data.NestedText.Serialize
 import Data.NestedText.Type
+import Data.NestedText.Util
 
 data TestLoad
   = TestLoad'Nothing
@@ -44,6 +53,34 @@ instance J.JSON I where
       return (ST.pack k, unI i)
   readJSON _ = J.Error "cannot convert json to nestedtext item"
   showJSON _ = error "unimplemented"
+
+readPlaintext :: FilePath -> IO TL.Text
+readPlaintext file = do
+  h <- openFile file ReadMode
+  hSetEncoding h utf8
+  hSetNewlineMode h noNewlineTranslation
+  TLIO.hGetContents h
+
+readJSON :: FilePath -> IO (Maybe Item)
+readJSON file = do
+  h <- openFile file ReadMode
+  hSetEncoding h utf8
+  hSetNewlineMode h nativeNewlineMode
+  ts <- TLIO.hGetContents h
+  -- workaround for json-0.11; not supported trailing whitespaces
+  return $ case J.decode $ TL.unpack $ TL.dropWhileEnd (== '\n') ts of
+    J.Ok (I i) -> Just $ f i
+    J.Error _err -> Nothing
+ where
+  f = case nativeNewline of
+    LF -> id
+    CRLF -> bimap (ST.fromText . r . ST.toText) r
+  r = T.intercalate osNewline
+    . runIdentity . freeTToLines . splitLines . PT.fromLazy . TL.fromStrict
+  bimap _fk fv (Item'String ts) = Item'String $ fv ts
+  bimap fk fv (Item'List vs) = Item'List $ V.map (bimap fk fv) vs
+  bimap fk fv (Item'Dictionary dic) =
+    Item'Dictionary $ bimap fk fv <$> M.mapKeys fk dic
 
 test_official :: IO [TestTree]
 test_official = do
@@ -105,34 +142,34 @@ test_official = do
     tls <- if elem d skipLoad then return [] else case tl of
       TestLoad'Nothing -> return []
       TestLoad'ShouldSuccess fin fout -> do
-        jout <- readFile' fout
-        case J.decode jout of
-          J.Ok (I iout) -> return $ singleton $ testCase "load" $ do
-            nin <- TL.readFile fin
-            case parse nin of
-              Right iin -> do
-                iin @?= iout
+        mjout <- readJSON fout
+        case mjout of
+          Just iout -> do
+            nin <- readPlaintext fin
+            return $ singleton $ testCase "load" $ case parse nin of
+              Right iin -> iin @?= iout
               Left err -> assertFailure $ show err
-          J.Error _err -> return []
-      TestLoad'ShouldFailure fin -> return $ singleton $ testCase "load" $ do
-        nin <- TL.readFile fin
-        case parse nin of
-          Right iin -> assertFailure $ "load succeed! it should fail. " ++ show iin
+          Nothing -> return []
+      TestLoad'ShouldFailure fin -> do
+        nin <- readPlaintext fin
+        return $ singleton $ testCase "load" $ case parse nin of
+          Right iin ->
+            assertFailure $ "load succeed! it should fail. " ++ show iin
           Left _err -> return ()
     tds <- if elem d skipDump then return [] else case td of
       TestDump'Nothing -> return []
       TestDump'ShouldSuccess fin fout -> do
-        jin <- readFile' fin
-        case J.decode jin of
-          J.Ok (I iin) -> return $ singleton $ testCase "dump" $ do
-            nout <- TL.readFile fout
-            serialize 4 iin @?= nout
-          J.Error _err -> return []
+        mjin <- readJSON fin
+        case mjin of
+          Just iin -> do
+            nout <- readPlaintext fout
+            return $ singleton $ testCase "dump" $ serialize 4 iin @?= nout
+          Nothing -> return []
       TestDump'ShouldFailure fin -> return $ singleton $ testCase "dump" $ do
-        jin <- readFile' fin
-        case J.decode jin of
-          J.Ok (I iin) -> do
+        mjin <- readJSON fin
+        case mjin of
+          Just iin -> do
             let _ = iin :: Item
             assertFailure $ "dump succeed! it should fail. " ++ show iin
-          J.Error _err -> return ()
+          Nothing -> return ()
     return $ testGroup d $ tls ++ tds

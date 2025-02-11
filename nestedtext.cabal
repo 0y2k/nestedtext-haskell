@@ -38,6 +38,7 @@ common depends
         containers >= 0.6.5 && < 0.8,
         microlens-platform >= 0.4.3.1 && < 0.5,
         pipes >= 4.0 && < 4.4,
+        pipes-text >= 1.0 && < 1.1,
         text >= 2.0 && < 2.2,
         text-short >= 0.1 && < 0.2,
         vector >= 0.13 && < 0.14,
@@ -53,7 +54,6 @@ library
         binary >= 0.8 && < 0.9,
         free >= 3.2 && < 5.3,
         generic-data >= 1.1 && < 1.2,
-        pipes-text >= 1.0 && < 1.1,
         pipes-parse >= 3.0 && < 3.1,
         transformers >= 0.6 && < 0.7,
     exposed-modules:
