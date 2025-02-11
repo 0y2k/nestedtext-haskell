@@ -29,6 +29,12 @@ jobs:
             ghc-version: '9.12'
 
     steps:
+      - name: CRLF for windows
+        if: runner.os == 'Windows'
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol crlf
+
       - uses: actions/checkout@v4
         with:
           submodules: recursive
