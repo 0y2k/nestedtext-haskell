@@ -39,7 +39,7 @@ serialize indentWidth = TLB.toLazyText . write
     || ST.null ts
     || (case ST.uncons ts of
       Nothing -> False
-      Just (c, _) -> C.isSpace c || S.member c specialCharsDict)
+      Just (c, _) -> C.isSpace c || S.member c specialCharsDict || c == '#')
     || (case ST.unsnoc ts of
       Nothing -> False
       Just (_, c) -> C.isSpace c || c == ':')
@@ -65,7 +65,7 @@ serialize indentWidth = TLB.toLazyText . write
       $ flip map (M.toAscList dic) $ \(k, vi) -> if isMultilineKey k
         then writeKey i k <> nl <> writeItem (i + indentWidth) vi
         else case denoteItem vi of
-          Denote'Null -> 
+          Denote'Null ->
             indent i <> TLB.fromText (ST.toText k) <> TLB.fromString ":"
           Denote'SingleLine ts ->
             indent i <> TLB.fromText (ST.toText k) <> TLB.fromString ": "
