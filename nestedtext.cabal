@@ -8,6 +8,8 @@ description:
 category:           Data
 license:            Apache-2.0
 license-file:       LICENSE
+homepage:           https://github.com/0y2k/nestedtext-haskell
+bug-reports:        https://github.com/0y2k/nestedtext-haskell/issues
 author:             0y2k <0x0y2k@gmail.com>
 maintainer:         0y2k <0x0y2k@gmail.com>
 copyright:          (c) 2025 0y2k
@@ -24,6 +26,10 @@ extra-source-files:
     vendor/github.com/KenKundert/nestedtext_tests/test_cases/**/dump_in.py,
     vendor/github.com/KenKundert/nestedtext_tests/test_cases/**/dump_out.nt,
     vendor/github.com/KenKundert/nestedtext_tests/test_cases/**/dump_err.json,
+
+source-repository head
+    type:     git
+    location: https://github.com/0y2k/nestedtext-haskell
 
 common depends
     build-depends:
