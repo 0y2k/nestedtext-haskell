@@ -52,7 +52,7 @@ instance ToItem TL.Text where
   type ToItemError TL.Text = Void
   toItem = Right . Item'String . TL.toStrict
 
-data ToItemError'List a
+newtype ToItemError'List a
   = ToItemError'List'ElementError (ToItemError a)
   deriving (Generic)
 instance Eq (ToItemError a) => Eq (ToItemError'List a) where

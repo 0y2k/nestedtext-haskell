@@ -50,13 +50,11 @@ splitLines p0 = F.FreeT $ go1 p0
         Right _ -> error "splitLines: unreachable"
 
 freeTToLines :: Monad m => F.FreeT (P.Producer T.Text m) m r -> m [T.Text]
-freeTToLines free = go free
-  where
-    go ft = do
-      step <- F.runFreeT ft
-      case step of
-        F.Pure _ -> return []
-        F.Free p0 -> do
-          (line, p1) <- P.fold' (<>) T.empty id p0
-          rest <- go p1
-          return $ line : rest
+freeTToLines ft = do
+  step <- F.runFreeT ft
+  case step of
+    F.Pure _ -> return []
+    F.Free p0 -> do
+      (line, p1) <- P.fold' (<>) T.empty id p0
+      rest <- freeTToLines p1
+      return $ line : rest

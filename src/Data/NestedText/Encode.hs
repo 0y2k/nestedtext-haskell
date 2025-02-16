@@ -11,7 +11,7 @@ import Generic.Data
 import Data.NestedText.To
 import Data.NestedText.Serialize
 
-data EncodeError a
+newtype EncodeError a
   = EncodeError'ToItemError (ToItemError a)
   deriving (Generic)
 instance Eq (ToItemError a) => Eq (EncodeError a) where

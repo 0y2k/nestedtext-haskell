@@ -10,7 +10,7 @@ module Data.NestedText.Parse
   , parseDocument
   ) where
 
-import Control.Monad (when)
+import Control.Monad (when, unless)
 import Control.Monad.Trans.Class (MonadTrans(..))
 import qualified Control.Monad.Trans.State.Strict as StateT
 import qualified Data.Char as C
@@ -85,7 +85,7 @@ toLine ts =
           )
         go revks (x:xs) = go (x:revks) xs
    in case drop indentLevel ts0 of
-        [] -> Right $ Line'Blank
+        [] -> Right Line'Blank
         '#':' ':cs1 -> Right $ Line'Comment indentLevel $ T.pack cs1
         '#':cs1 -> Right $ Line'Comment indentLevel $ T.pack cs1
         ['>'] -> Right $ Line'StringItem indentLevel T.empty
@@ -141,7 +141,7 @@ parse ts0 = StateT.evalStateT parser
   parser = do
     xi <- readItemIndent [EQ] 0
     b <- PP.isEndOfInput
-    when (not b) $ lift $ Left ParseError'RemainingContent
+    unless b $ lift $ Left ParseError'RemainingContent
     return xi
   toItemWithoutError :: (ToItem a, ToItemError a ~ Void) => a -> Item
   toItemWithoutError x = case toItem x of
@@ -155,7 +155,7 @@ parse ts0 = StateT.evalStateT parser
 
   readItemIndent cs i = do
     (item, j) <- readItem
-    when ((i `compare` j) `notElem` cs) $ lift $ Left ParseError'InvalidIndent
+    unless ((i `compare` j) `elem` cs) $ lift $ Left ParseError'InvalidIndent
     return item
   readItem = do
     ml <- PP.peek
@@ -282,7 +282,7 @@ parse ts0 = StateT.evalStateT parser
       vs <- readInlineList0
       readInlineSpace
       b <- PP.isEndOfInput
-      when (not b) $ lift $ Left ParseError'RemainingInlineContent
+      unless b $ lift $ Left ParseError'RemainingInlineContent
       return vs
   parseInlineDict = lift . StateT.evalStateT go . mapM_ P.yield . T.unpack
    where
@@ -290,7 +290,7 @@ parse ts0 = StateT.evalStateT parser
       dic <- readInlineDict0
       readInlineSpace
       b <- PP.isEndOfInput
-      when (not b) $ lift $ Left ParseError'RemainingInlineContent
+      unless b $ lift $ Left ParseError'RemainingInlineContent
       return dic
   readInlineChar x = do
     mc <- PP.draw

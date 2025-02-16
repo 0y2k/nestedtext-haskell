@@ -45,7 +45,7 @@ instance J.JSON I where
   readJSON (J.JSString jsstr) =
     J.Ok $ I $ Item'String $ T.pack $ J.fromJSString jsstr
   readJSON (J.JSArray vs) =
-    fmap (I . Item'List . V.fromList) $ forM vs $ \vi -> unI <$> J.readJSON vi
+    fmap (I . Item'List . V.fromList) $ forM vs $ fmap unI . J.readJSON
   readJSON (J.JSObject jsobj) =
     fmap (I . Item'Dictionary . M.fromList)
     $ forM (J.fromJSObject jsobj) $ \(k, v) -> do
@@ -142,7 +142,7 @@ test_official = do
         (False, False) -> error $ d0 ++ ": no expected result"
     return (d0, tl, td)
   forM ts $ \(d, tl, td) -> do
-    tls <- if elem d skipLoad then return [] else case tl of
+    tls <- if d `elem` skipLoad then return [] else case tl of
       TestLoad'Nothing -> return []
       TestLoad'ShouldSuccess fin fout -> do
         mjout <- readJSON fout
@@ -159,7 +159,7 @@ test_official = do
           Right iin ->
             assertFailure $ "load succeed! it should fail. " ++ show iin
           Left _err -> return ()
-    tds <- if elem d skipDump then return [] else case td of
+    tds <- if d `elem` skipDump then return [] else case td of
       TestDump'Nothing -> return []
       TestDump'ShouldSuccess fin fout -> do
         mjin <- readJSON fin
