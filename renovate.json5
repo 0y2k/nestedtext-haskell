@@ -1,0 +1,17 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends:
+  [ "config:recommended"
+  ],
+  configMigration: true,
+  dependencyDashboard: false,
+  minimumReleaseAge: "3 days",
+  packageRules: [
+    {
+      matchUpdateTypes: ["major", "minor", "patch", "rollback"],
+      automerge: true,
+    },
+  ],
+  prConcurrentLimit: 0,
+  rebaseWhen: "never",
+}
