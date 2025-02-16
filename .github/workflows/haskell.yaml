@@ -33,8 +33,7 @@ jobs:
       - name: CRLF for windows
         if: runner.os == 'Windows'
         run: |
-          git config --global core.autocrlf false
-          git config --global core.eol crlf
+          git config --global core.autocrlf true
 
       - uses: actions/checkout@v4
         with:
