@@ -89,7 +89,10 @@ test_official = do
         </> "KenKundert"
         </> "nestedtext_tests"
         </> "test_cases"
-      skipLoad = []
+      skipLoad =
+        -- because invalid value
+        [ "empty_1"
+        ]
       skipDump =
         -- because disordered keys of dict
         [ "dict_17"
