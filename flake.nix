@@ -63,7 +63,7 @@
         };
 
         # haskell-flake doesn't set the default package, but you can do it here.
-        packages.default = self'.packages.nested-text;
+        packages.default = self'.packages.nestedtext;
       };
     };
 }
