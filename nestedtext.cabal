@@ -85,6 +85,7 @@ test-suite nested-text-test
         tasty-hedgehog,
         tasty-hunit,
     other-modules:
+        Empty,
         Official,
         Property,
         Util,
