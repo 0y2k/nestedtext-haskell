@@ -1,5 +1,12 @@
 # Revision history for nestedtext
 
+## 0.1.3 -- 2025/02/22
+
+* chore(deps): Move microlens-platform from common depends
+* style(treewide): Apply stylish-haskell
+* test(Empty): Parse empty string
+* refactor(treewide): Apply hlint
+
 ## 0.1.2 -- 2025/02/16
 
 * fix(test/Official): Disable empty\_1 test
