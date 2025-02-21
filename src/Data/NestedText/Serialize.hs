@@ -5,6 +5,9 @@ module Data.NestedText.Serialize
   , serialize'
   ) where
 
+import Data.NestedText.Type
+import Data.NestedText.Util
+
 import qualified Data.Char as C
 import Data.Functor.Identity (Identity(..))
 import Data.List (intersperse)
@@ -19,9 +22,6 @@ import qualified Data.Vector as V
 import Generic.Data
 import Lens.Micro.Platform
 import qualified Pipes.Text as PT
-
-import Data.NestedText.Type
-import Data.NestedText.Util
 
 data Denote
   = Denote'Null

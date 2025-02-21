@@ -2,11 +2,11 @@
 
 module Util where
 
+import Data.NestedText.Util
+
 import qualified Pipes as P
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@?=))
-
-import Data.NestedText.Util
 
 test_lines :: TestTree
 test_lines = testGroup "splitLines" $

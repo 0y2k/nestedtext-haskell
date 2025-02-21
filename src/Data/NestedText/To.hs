@@ -5,6 +5,8 @@
 
 module Data.NestedText.To where
 
+import Data.NestedText.Type
+
 import Control.Monad (forM)
 import Data.Bifunctor (Bifunctor(first))
 import qualified Data.ByteString as BS
@@ -19,8 +21,6 @@ import qualified Data.Text.Short as ST
 import qualified Data.Vector as V
 import Data.Void (Void)
 import Generic.Data
-
-import Data.NestedText.Type
 
 class ToItem a where
   type ToItemError a :: Type

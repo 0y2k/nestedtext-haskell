@@ -10,7 +10,11 @@ module Data.NestedText.Parse
   , parseDocument
   ) where
 
-import Control.Monad (when, unless)
+import Data.NestedText.To (ToItem(..), ToKey(..))
+import Data.NestedText.Type
+import Data.NestedText.Util
+
+import Control.Monad (unless, when)
 import Control.Monad.Trans.Class (MonadTrans(..))
 import qualified Control.Monad.Trans.State.Strict as StateT
 import qualified Data.Char as C
@@ -26,10 +30,6 @@ import qualified Pipes.Parse as PP
 import qualified Pipes.Prelude as P
 import qualified Pipes.Text as PT
 import Prelude hiding (readList)
-
-import Data.NestedText.To (ToItem(..), ToKey(..))
-import Data.NestedText.Type
-import Data.NestedText.Util
 
 data Line
   = Line'Blank

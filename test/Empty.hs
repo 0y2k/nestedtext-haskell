@@ -2,11 +2,11 @@
 
 module Empty where
 
-import Test.Tasty (TestTree, testGroup)
-import Test.Tasty.HUnit (testCase, (@?=))
-
 import Data.NestedText.Parse
 import Data.NestedText.Type
+
+import Test.Tasty (TestTree, testGroup)
+import Test.Tasty.HUnit (testCase, (@?=))
 
 test_empty :: TestTree
 test_empty = testGroup "empty"

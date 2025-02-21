@@ -1,5 +1,9 @@
 module Property where
 
+import Data.NestedText.Parse
+import Data.NestedText.Serialize
+import Data.NestedText.Type
+
 import qualified Data.Char as C
 import qualified Data.Map.Strict as M
 import qualified Data.Text as T
@@ -10,10 +14,6 @@ import qualified Hedgehog.Gen as HG
 import qualified Hedgehog.Range as HR
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.Hedgehog (testProperty)
-
-import Data.NestedText.Parse
-import Data.NestedText.Serialize
-import Data.NestedText.Type
 
 genItem :: H.MonadGen m => H.Range Int -> H.Range Int -> H.Range Int -> m Item
 genItem rs rk rn = go

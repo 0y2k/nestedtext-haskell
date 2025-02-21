@@ -4,12 +4,12 @@
 
 module Data.NestedText.Encode where
 
+import Data.NestedText.Serialize
+import Data.NestedText.To
+
 import Data.Bifunctor (first)
 import qualified Data.Text.Lazy as TL
 import Generic.Data
-
-import Data.NestedText.To
-import Data.NestedText.Serialize
 
 newtype EncodeError a
   = EncodeError'ToItemError (ToItemError a)

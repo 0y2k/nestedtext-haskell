@@ -4,12 +4,12 @@
 
 module Data.NestedText.Decode where
 
+import Data.NestedText.From
+import Data.NestedText.Parse
+
 import Data.Bifunctor (first)
 import qualified Data.Text.Lazy as TL
 import Generic.Data
-
-import Data.NestedText.From
-import Data.NestedText.Parse
 
 data DecodeError a
   = DecodeError'ParseError ParseError

@@ -1,5 +1,10 @@
 module Official where
 
+import Data.NestedText.Parse
+import Data.NestedText.Serialize
+import Data.NestedText.Type
+import Data.NestedText.Util
+
 import Control.Monad (forM)
 import Data.Functor.Identity (Identity(..))
 import Data.List (singleton)
@@ -12,20 +17,12 @@ import qualified Data.Vector as V
 import qualified Pipes.Text as PT
 import System.Directory (doesFileExist, listDirectory)
 import System.FilePath ((</>))
-import System.IO
-  ( IOMode(..), Newline(..)
-  , hSetEncoding, hSetNewlineMode
-  , nativeNewline, nativeNewlineMode, noNewlineTranslation
-  , openFile, utf8
-  )
+import System.IO (IOMode(..), Newline(..), hSetEncoding, hSetNewlineMode,
+                  nativeNewline, nativeNewlineMode, noNewlineTranslation,
+                  openFile, utf8)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (assertFailure, testCase, (@?=))
 import qualified Text.JSON as J
-
-import Data.NestedText.Parse
-import Data.NestedText.Serialize
-import Data.NestedText.Type
-import Data.NestedText.Util
 
 data TestLoad
   = TestLoad'Nothing
