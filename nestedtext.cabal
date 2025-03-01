@@ -35,7 +35,7 @@ common depends
     build-depends:
         base >= 4.17 && < 4.22,
         bytestring >= 0.11 && < 0.13,
-        containers >= 0.6.5 && < 0.8,
+        containers >=0.6.5 && <0.9,
         pipes >= 4.0 && < 4.4,
         pipes-text >= 1.0 && < 1.1,
         text >= 2.0 && < 2.2,
